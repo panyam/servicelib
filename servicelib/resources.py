@@ -21,6 +21,9 @@ class BaseResource(Resource):
     """
     A wrapper to work with restful calls on restli formatted resources.
     """
+    def get_routes(cls):
+        return []
+
     def get(self, **kwargs):
         method_name = "do_get"
         if request.args.get("q", "").strip():
