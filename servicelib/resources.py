@@ -73,9 +73,11 @@ class BaseResource(Resource):
         param_value = None
         if request.get_json():
             param_value = request.get_json().get(param_name, "")
-        if not param_value:
+        if param_value is None:
             param_value = request.args.get(param_name)
-        if not param_value and no_blank:
+        if param_value is None and no_blank:
+            print "param_name, param_value = ", param_name, param_value
+            print "json = ", request.get_json()
             raise HttpException("Parameter '%s' is required" % param_name, 400)
         if type(param_value) in (str, unicode):
             param_value = param_value.strip()
