@@ -64,6 +64,14 @@ class BaseResource(Resource):
             print >> sys.stderr, "HttpMethod: %s, Resource: %s, Handler: %s" % (http_method, self.__class__, method_name)
             raise
 
+    def param_if_exists(self, param_name):
+        param_value = None
+        if request.get_json():
+            param_value = request.get_json().get(param_name, "")
+        if param_value is None:
+            param_value = request.args.get(param_name)
+        return param_value
+
     def ensure_param(self, param_name, converter = None, no_blank = True):
         """
         Ensures that a parameter by a given name exists, and can be applied to the converter (if provided)
