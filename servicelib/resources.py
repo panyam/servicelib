@@ -55,6 +55,8 @@ class BaseResource(Resource):
             return getattr(self, method_name)(**kwargs)
         except errors.HttpException, exc:
             return error_json(exc.message), exc.status
+        except errors.ValidationError, exc:
+            return error_json(exc.message), 400
         except Exception, exc:
             print >> sys.stderr, "HttpMethod: %s, Resource: %s, Handler: %s" % (http_method, self.__class__, method_name)
             raise
