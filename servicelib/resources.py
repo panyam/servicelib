@@ -66,27 +66,3 @@ class BaseResource(Resource):
         if param_value is None:
             param_value = request.args.get(param_name)
         return param_value
-
-    def ensure_param(self, param_name, converter = None, no_blank = True):
-        """
-        Ensures that a parameter by a given name exists, and can be applied to the converter (if provided)
-        If the parameter by the name does not exist or if converter(param_value) throws an exception
-        then a errors.HttpException is thrown.
-        """
-        param_value = None
-        if request.get_json():
-            param_value = request.get_json().get(param_name, "")
-        if param_value is None:
-            param_value = request.args.get(param_name)
-        if param_value is None and no_blank:
-            print "param_name, param_value = ", param_name, param_value
-            print "json = ", request.get_json()
-            raise errors.HttpException("Parameter '%s' is required" % param_name, 400)
-        if type(param_value) in (str, unicode):
-            param_value = param_value.strip()
-        if converter:
-            try:
-                return converter(param_value)
-            except Exception, exc:
-                raise errors.HttpException("Unable to coerce parameter: '%s'" % param_name, 400)
-        return param_value
