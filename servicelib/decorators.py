@@ -27,14 +27,15 @@ def ensure_param(param_name, validator=None, no_blank=True, target=None, only_if
                 print "param_name, param_value = ", param_name, param_value
                 print "json = ", request.get_json()
                 raise errors.HttpException("Parameter '%s' is required" % param_name, 400)
-            if type(param_value) in (str, unicode):
-                param_value = param_value.strip()
-            if validator:
-                try:
-                    param_value = validator(param_value)
-                except Exception, exc:
-                    raise errors.ValidationError("Unable to coerce parameter: '%s'" % param_name)
-            kwargs[target or param_name] = param_value
+            if param_value is not None:
+                if type(param_value) in (str, unicode):
+                    param_value = param_value.strip()
+                if validator:
+                    try:
+                        param_value = validator(param_value)
+                    except Exception, exc:
+                        raise errors.ValidationError("Unable to coerce parameter: '%s'" % param_name)
+                kwargs[target or param_name] = param_value
             return request_handler_func(*args, **kwargs)
         worker_func.func_name = request_handler_func.func_name
         return worker_func
