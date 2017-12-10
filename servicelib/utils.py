@@ -9,7 +9,8 @@ DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 def ensure_date(date_format = DEFAULT_DATE_FORMAT):
     import datetime
     def ensurer(strinput):
-        return datetime.datetime.strptime(date_format)
+        return datetime.datetime.strptime(strinput, date_format)
+    return ensurer
 
 def get_custom_id(kwargs):
     id = None
