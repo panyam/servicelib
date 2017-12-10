@@ -18,11 +18,13 @@ def ensure_param(param_name, validator=None, no_blank=True, target=None, only_if
             """
             if not kwargs:
                 kwargs = {}
+            # Get POST values first
             param_value = kwargs.get(param_name, None)
-            if param_value is None and request.get_json():
-                param_value = request.get_json().get(param_name, "")
+
             if param_value is None:
+                # Try query params
                 param_value = request.args.get(param_name)
+
             if param_value is None and no_blank and not only_if_exists:
                 print "param_name, param_value = ", param_name, param_value
                 print "json = ", request.get_json()

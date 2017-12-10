@@ -10,3 +10,9 @@ def ensure_date(date_format = DEFAULT_DATE_FORMAT):
     import datetime
     def ensurer(strinput):
         return datetime.datetime.strptime(date_format)
+
+def get_custom_id(kwargs):
+    id = None
+    if is_dev_mode() and "id" in kwargs:
+        id = kwargs["id"]
+    return id

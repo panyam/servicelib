@@ -36,12 +36,22 @@ class BaseResource(Resource):
             method_name = "do_post_%s" % request.headers.get("X-RestLi-Method", "").strip()
         elif request.args.get("action", "").strip():
             method_name = "do_action_%s" % request.args.get("action", "").strip()
+        if request.values:
+            kwargs.update(request.values.to_dict())
+        content_type = request.content_type.lower()
+        if content_type == "application/json":
+            kwargs.update(request.get_json())
         return self.find_and_invoke_method("POST", method_name, **kwargs)
 
     def put(self, **kwargs):
         method_name = "do_put"
         if request.headers.get("X-RestLi-Method", "").strip():
             method_name = "do_put_%s" % request.headers.get("X-RestLi-Method", "").strip()
+        if request.values:
+            kwargs.update(request.values.to_dict())
+        content_type = request.content_type.lower()
+        if content_type == "application/json":
+            kwargs.update(request.get_json())
         return self.find_and_invoke_method("PUT", method_name, **kwargs)
 
     def delete(self, **kwargs):
@@ -52,14 +62,15 @@ class BaseResource(Resource):
         if not hasattr(self, method_name):
             return error_json("%s handler (%s) not found" % (http_method, method_name)), 405
         try:
-            return getattr(self, method_name)(**kwargs)
+            method = getattr(self, method_name)
         except errors.HttpException, exc:
             return error_json(exc.message), exc.status
         except errors.ValidationError, exc:
             return error_json(exc.message), 400
         except Exception, exc:
-            print >> sys.stderr, "HttpMethod: %s, Resource: %s, Handler: %s" % (http_method, self.__class__, method_name)
+            print >> sys.stderr, "Unable to find HttpMethod: %s, Resource: %s, Handler: %s" % (http_method, self.__class__, method_name)
             raise
+        return method(**kwargs)
 
     def param_if_exists(self, param_name):
         param_value = None
