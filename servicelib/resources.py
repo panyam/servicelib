@@ -5,7 +5,7 @@ import traceback, sys
 from functools import wraps
 from flask import request
 from flask_restplus import Resource, fields
-import utils as neutils
+import utils
 import errors
 
 def handle_api_errors(handler):
@@ -15,20 +15,20 @@ def handle_api_errors(handler):
             return handler(*args, **kwargs)
         except errors.NotFound, error:
             traceback.print_exc()
-            return neutils.error_json(error.message), 404
+            return utils.error_json(error.message), 404
         except errors.NotAllowed, error:
             traceback.print_exc()
-            return neutils.error_json(error.message), 403
+            return utils.error_json(error.message), 403
         except errors.NotAllowed, error:
             traceback.print_exc()
-            return neutils.error_json(error.message), 403
+            return utils.error_json(error.message), 403
         except errors.Unauthorized, error:
             traceback.print_exc()
             from google.appengine.api import users
-            return neutils.error_json(error.message), 401, {'Location': users.create_login_url('/mysession/')}
+            return utils.error_json(error.message), 401, {'Location': users.create_login_url('/mysession/')}
         except errors.ValidationError, error:
             traceback.print_exc()
-            return neutils.error_json(error.message), 400
+            return utils.error_json(error.message), 400
         except Exception, exc:
             # exc_type, exc_value, tb = sys.exc_info()
             traceback.print_exc()
@@ -44,7 +44,7 @@ class BaseResource(Resource):
     @property
     def params(self):
         if self._params is None:
-            self._params = neutils.RequestParamSource(request)
+            self._params = utils.RequestParamSource(request)
         return self._params
 
     @property
