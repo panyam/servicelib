@@ -2,16 +2,13 @@
 import logging
 import os, datetime
 import errors
-from itertools import izip
-from flask import json
-
-from werkzeug.routing import BaseConverter
 
 DATE_ZERO = datetime.datetime.utcfromtimestamp(0)
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 DEFAULT_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 def ngrams(word, n):
+    from itertools import izip
     return ["".join(x) for x in izip(*[word[i:] for i in range(n)])]
 
 def getLogger(name, level = logging.INFO):
@@ -26,31 +23,10 @@ def set_trace():
 
 def error_json(value): return {'message': value}
 
-class NEJsonEncoder(json.JSONEncoder):
-    def default(self, obj):
-        from google.appengine.ext import ndb
-        if isinstance(obj, datetime.datetime):
-            return (obj - DATE_ZERO).total_seconds()
-        elif isinstance(obj, ndb.Key):
-            return obj.id()
-        elif hasattr(obj, "to_json"):
-            return obj.to_json()
-        return super(NEJsonEncoder, self).default(obj)
-
 def nonempty(s):
     if s is None or not s.strip():
         return None
     return s
-
-def is_dev_mode():
-    return os.environ.get('APPLICATION_ID').startswith("dev~")
-
-class LongConverter(BaseConverter):
-    def to_python(self, value):
-        return long(value)
-
-    def to_url(self, value):
-        return str(value)
 
 def ensure_date(date_format = DEFAULT_DATE_FORMAT):
     import datetime
